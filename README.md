@@ -59,6 +59,44 @@ roslaunch localiza_o_robotica localization.launch \
 
 Finalize o launch com `Ctrl+C` para gravar automaticamente os arquivos em `results/`.
 
+
+## Gravando uma trajetoria para comparar
+
+Com o `roscore` e o Gazebo rodando, grave uma trajetoria uma unica vez:
+
+```bash
+cd ~/catkin_ws
+source devel/setup.bash
+roslaunch localiza_o_robotica record_trajectory.launch \
+  bag:=$(rospack find localiza_o_robotica)/bags/husky_trajectory.bag
+```
+
+Enquanto esse launch estiver rodando, mova o Husky pelo mapa. Quando terminar, use
+`Ctrl+C`. O bag vai conter os topicos normalizados `/wheel/odom`, `/imu/data`,
+`/fix` e `/gt/odom`.
+
+Depois compare os tres metodos usando exatamente a mesma gravacao:
+
+```bash
+roslaunch localiza_o_robotica replay_bag.launch mode:=odom
+roslaunch localiza_o_robotica replay_bag.launch mode:=odom_imu
+roslaunch localiza_o_robotica replay_bag.launch mode:=odom_imu_gps
+```
+
+Cada replay termina sozinho quando o bag acaba e grava os arquivos em `results/`:
+
+```bash
+cat $(rospack find localiza_o_robotica)/results/odom_summary.txt
+cat $(rospack find localiza_o_robotica)/results/odom_imu_summary.txt
+cat $(rospack find localiza_o_robotica)/results/odom_imu_gps_summary.txt
+```
+
+Ou gere uma tabela direta:
+
+```bash
+rosrun localiza_o_robotica compare_results.py
+```
+
 ## Metricas geradas
 
 O no `localization_metrics.py` compara `/odometry/filtered` com `/gt/odom` e calcula:

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="bag" default="$(find localiza_o_robotica)/bags/husky_trajectory.bag"/>
+  <arg name="wheel_odom_topic" default="/husky_velocity_controller/odom"/>
+  <arg name="imu_topic" default="/imu/data"/>
+  <arg name="fix_topic" default="/fix"/>
+  <arg name="model_name" default="husky"/>
+
+  <group if="$(eval arg(&quot;wheel_odom_topic&quot;) != &quot;/wheel/odom&quot;)">
+    <node pkg="topic_tools" type="relay" name="relay_record_wheel_odom"
+          args="$(arg wheel_odom_topic) /wheel/odom"/>
+  </group>
+
+  <group if="$(eval arg(&quot;imu_topic&quot;) != &quot;/imu/data&quot;)">
+    <node pkg="topic_tools" type="relay" name="relay_record_imu"
+          args="$(arg imu_topic) /imu/data"/>
+  </group>
+
+  <group if="$(eval arg(&quot;fix_topic&quot;) != &quot;/fix&quot;)">
+    <node pkg="topic_tools" type="relay" name="relay_record_fix"
+          args="$(arg fix_topic) /fix"/>
+  </group>
+
+  <node pkg="localiza_o_robotica" type="gt_odom_publisher.py" name="gt_odom_publisher" output="screen">
+    <param name="model_name" value="$(arg model_name)"/>
+  </node>
+
+  <node pkg="rosbag" type="record" name="record_trajectory" output="screen"
+        args="-O $(arg bag) /clock /wheel/odom /imu/data /fix /gt/odom"/>
+</launch>

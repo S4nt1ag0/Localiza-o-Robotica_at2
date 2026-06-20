@@ -5,6 +5,7 @@
   <arg name="imu_topic" default="/imu/data"/>
   <arg name="fix_topic" default="/fix"/>
   <arg name="model_name" default="husky"/>
+  <arg name="publish_gt" default="true"/>
   <arg name="record_metrics" default="true"/>
   <arg name="output_dir" default="$(find localiza_o_robotica)/results"/>
 
@@ -26,9 +27,11 @@
     <node pkg="localiza_o_robotica" type="gps_to_odom.py" name="gps_to_odom" output="screen"/>
   </group>
 
-  <node pkg="localiza_o_robotica" type="gt_odom_publisher.py" name="gt_odom_publisher" output="screen">
-    <param name="model_name" value="$(arg model_name)"/>
-  </node>
+  <group if="$(arg publish_gt)">
+    <node pkg="localiza_o_robotica" type="gt_odom_publisher.py" name="gt_odom_publisher" output="screen">
+      <param name="model_name" value="$(arg model_name)"/>
+    </node>
+  </group>
 
   <group if="$(eval arg(&quot;mode&quot;) == &quot;odom&quot;)">
     <rosparam command="load" file="$(find localiza_o_robotica)/config/ekf_odom.yaml"/>

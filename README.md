@@ -168,9 +168,7 @@ O script `localization_metrics.py` compara `/odometry/filtered` com `/gt/odom` e
 
 ## Resultados e discussao
 
-Os resultados obtidos ficam em `results/` e permitem comparar o desempenho dos tres modos. A bag original foi gravada com o Husky deslocado no mundo (`x=4.65`, `y=3.0`), enquanto a odometria do robo comeca perto de zero. Por isso, o replay passa explicitamente o offset fixo `gt_offset_x=-4.65` e `gt_offset_y=-3.0` para as metricas, colocando o ground truth no mesmo referencial da odometria antes de calcular os erros.
-
-Na execucao abaixo, o modo `odom_imu_gps` teve o menor erro de posicao, com RMSE de 1,022 m. Os modos `odom` e `odom_imu` ficaram praticamente iguais em posicao, com RMSE em torno de 3,058 m, indicando que a IMU sozinha quase nao altera a trajetoria estimada em x/y neste teste. Na orientacao, porem, a IMU teve impacto forte: o RMSE de yaw caiu de 1,650 rad em `odom` para cerca de 0,005 rad nos modos com IMU.
+Os resultados obtidos ficam em `results/` e permitem comparar o desempenho dos tres modos. Na execucao abaixo, o modo `odom_imu_gps` teve o menor erro de posicao, com RMSE de 1,022 m. Os modos `odom` e `odom_imu` ficaram praticamente iguais em posicao, com RMSE em torno de 3,058 m, indicando que a IMU sozinha quase nao altera a trajetoria estimada em x/y neste teste. Na orientacao, porem, a IMU teve impacto forte: o RMSE de yaw caiu de 1,650 rad em `odom` para cerca de 0,005 rad nos modos com IMU.
 
 | modo | amostras | RMSE posicao (m) | erro final posicao (m) | RMSE yaw (rad) | erro final yaw (rad) |
 | --- | ---: | ---: | ---: | ---: | ---: |

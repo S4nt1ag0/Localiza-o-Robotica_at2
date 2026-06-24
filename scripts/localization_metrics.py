@@ -23,7 +23,9 @@ class LocalizationMetrics(object):
         self.filtered_topic = rospy.get_param("~filtered_topic", "/odometry/filtered")
         self.gt_topic = rospy.get_param("~gt_topic", "/gt/odom")
         self.max_pair_dt = rospy.Duration(rospy.get_param("~max_pair_dt", 0.1))
-
+        self.gt_offset_x = rospy.get_param("~gt_offset_x", 0.0)
+        self.gt_offset_y = rospy.get_param("~gt_offset_y", 0.0)
+        
         self.latest_gt = None
         self.rows = []
         self.sum_sq_pos = 0.0
@@ -52,8 +54,8 @@ class LocalizationMetrics(object):
 
         fx = msg.pose.pose.position.x
         fy = msg.pose.pose.position.y
-        gx = self.latest_gt.pose.pose.position.x
-        gy = self.latest_gt.pose.pose.position.y
+        gx = self.latest_gt.pose.pose.position.x + self.gt_offset_x
+        gy = self.latest_gt.pose.pose.position.y + self.gt_offset_y
 
         pos_error = math.hypot(fx - gx, fy - gy)
         yaw_error = wrap_angle(yaw_from_quaternion(msg.pose.pose.orientation) -

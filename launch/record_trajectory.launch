@@ -4,6 +4,8 @@
   <arg name="wheel_odom_topic" default="/husky_velocity_controller/odom"/>
   <arg name="imu_topic" default="/imu/data"/>
   <arg name="fix_topic" default="/navsat/fix"/>
+  <arg name="gt_topic" default="/gazebo_ground_truth/odom"/>
+  <arg name="use_gazebo_ground_truth_topic" default="true"/>
   <arg name="model_name" default="husky"/>
 
   <group if="$(eval arg(&quot;wheel_odom_topic&quot;) != &quot;/wheel/odom&quot;)">
@@ -21,9 +23,16 @@
           args="$(arg fix_topic) /fix"/>
   </group>
 
-  <node pkg="localiza_o_robotica" type="gt_odom_publisher.py" name="gt_odom_publisher" output="screen">
-    <param name="model_name" value="$(arg model_name)"/>
-  </node>
+  <group if="$(arg use_gazebo_ground_truth_topic)">
+    <node pkg="topic_tools" type="relay" name="relay_record_gt"
+          args="$(arg gt_topic) /gt/odom"/>
+  </group>
+
+  <group unless="$(arg use_gazebo_ground_truth_topic)">
+    <node pkg="localiza_o_robotica" type="gt_odom_publisher.py" name="gt_odom_publisher" output="screen">
+      <param name="model_name" value="$(arg model_name)"/>
+    </node>
+  </group>
 
   <node pkg="rosbag" type="record" name="record_trajectory" output="screen"
         args="-O $(arg bag) /clock /wheel/odom /imu/data /navsat/fix /gt/odom"/>

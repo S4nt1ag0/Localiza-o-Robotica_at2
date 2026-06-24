@@ -4,6 +4,8 @@
   <arg name="bag" default="$(find localiza_o_robotica)/bags/husky_trajectory.bag"/>
   <arg name="rate" default="1.0"/>
   <arg name="output_dir" default="$(find localiza_o_robotica)/results"/>
+  <arg name="gt_offset_x" default="-4.65"/>
+  <arg name="gt_offset_y" default="-3.0"/>
 
   <param name="/use_sim_time" value="true"/>
 
@@ -15,6 +17,8 @@
     <arg name="publish_gt"     value="false"/>
     <arg name="record_metrics" value="true"/>
     <arg name="output_dir"     value="$(arg output_dir)"/>
+    <arg name="gt_offset_x"    value="$(arg gt_offset_x)"/>
+    <arg name="gt_offset_y"    value="$(arg gt_offset_y)"/>
   </include>
 
   <node pkg="rosbag" type="play" name="play_trajectory" output="log" required="true"

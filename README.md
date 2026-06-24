@@ -125,7 +125,7 @@ roslaunch localiza_o_robotica record_trajectory.launch \
   bag:=$(rospack find localiza_o_robotica)/bags/husky_trajectory.bag
 ```
 
-Manipule o robo com o joystick gerado no Terminal 3. Depois de um tempo, pare a gravacao no Terminal 4 com `Ctrl+C`. O bag vai conter os topicos normalizados `/wheel/odom`, `/imu/data`, `/fix` e `/gt/odom`.
+Manipule o robo com o joystick gerado no Terminal 3. Depois de um tempo, pare a gravacao no Terminal 4 com `Ctrl+C`. Por padrao, o launch usa o topico `/gazebo_ground_truth/odom`, gerado pelo plugin P3D configurado em `lar_gazebo/husky_urdf_extras/gazebo_ground_truth.urdf`, e o relaya para `/gt/odom`. Esse topico ja aplica o offset do mundo do Husky. O bag vai conter os topicos `/wheel/odom`, `/imu/data`, `/navsat/fix` e `/gt/odom`. Se uma nova bag for gravada dessa forma, o replay deve ser executado com `gt_offset_x:=0.0 gt_offset_y:=0.0`, pois o ground truth ja estara corrigido na gravacao.
 
 ## Executando os testes com a bag
 
@@ -168,17 +168,19 @@ O script `localization_metrics.py` compara `/odometry/filtered` com `/gt/odom` e
 
 ## Resultados e discussao
 
-Os resultados obtidos ficam em `results/` e permitem comparar o desempenho dos tres modos. Na execucao abaixo, os tres filtros tiveram erro de posicao muito parecido, com RMSE em torno de 5,63 m e erro final em torno de 6,05 m. A diferenca mais clara apareceu na orientacao: ao adicionar a IMU, o RMSE de yaw caiu de 0,020987 rad para 0,005610 rad, e com IMU + GPS ficou em 0,004573 rad.
+Os resultados obtidos ficam em `results/` e permitem comparar o desempenho dos tres modos. A bag original foi gravada com o Husky deslocado no mundo (`x=4.65`, `y=3.0`), enquanto a odometria do robo comeca perto de zero. Por isso, o replay passa explicitamente o offset fixo `gt_offset_x=-4.65` e `gt_offset_y=-3.0` para as metricas, colocando o ground truth no mesmo referencial da odometria antes de calcular os erros.
+
+Na execucao abaixo, o modo `odom_imu_gps` teve o menor erro de posicao, com RMSE de 0,532 m e erro final de 0,004 m. Os modos `odom` e `odom_imu` ficaram muito proximos em posicao, por volta de 1,404 m de RMSE. Na orientacao, a IMU reduziu bastante o erro de yaw em comparacao com odometria pura.
 
 | modo | amostras | RMSE posicao (m) | erro final posicao (m) | RMSE yaw (rad) | erro final yaw (rad) |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `odom` | 2099 | 5.629646 | 6.050049 | 0.020987 | 0.000079 |
-| `odom_imu` | 2098 | 5.630747 | 6.048574 | 0.005610 | 0.000186 |
-| `odom_imu_gps` | 2099 | 5.631216 | 6.050032 | 0.004573 | 0.000079 |
+| `odom` | 2105 | 1.404986 | 0.745163 | 0.021598 | 0.000186 |
+| `odom_imu` | 2100 | 1.403560 | 0.745153 | 0.005231 | 0.000186 |
+| `odom_imu_gps` | 2101 | 0.532024 | 0.004468 | 0.005585 | 0.000186 |
 
-Neste teste, o GPS nao reduziu significativamente o erro de posicao. Isso pode acontecer quando a conversao do GPS para odometria local usa uma origem simples e quando a trajetoria gravada, os ruidos/covariancias e o proprio filtro deixam a estimativa dominada pela odometria das rodas. Mesmo assim, o modo `odom_imu_gps` manteve o melhor RMSE de yaw entre as tres configuracoes.
+Esses resultados indicam que a IMU melhora principalmente a estimativa angular, enquanto o GPS melhora a posicao global quando o ground truth e a odometria sao comparados no mesmo referencial.
 
-O grafico de erro de posicao mostra que as tres curvas ficam muito proximas durante quase todo o replay:
+O grafico de erro de posicao mostra a reducao do erro no modo com GPS em relacao aos modos sem GPS:
 
 ![Comparacao do erro de posicao](results/comparison_position_error.png)
 

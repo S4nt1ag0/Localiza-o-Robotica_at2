@@ -1,0 +1,6 @@
+run_name: odom_imu
+samples: 2389
+rmse_position_m: 3.057735
+final_position_error_m: 2.186940
+rmse_yaw_rad: 0.005021
+final_yaw_error_rad: 0.000236

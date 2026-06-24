@@ -1,0 +1,6 @@
+run_name: odom
+samples: 2389
+rmse_position_m: 3.057741
+final_position_error_m: 2.186764
+rmse_yaw_rad: 1.650173
+final_yaw_error_rad: 0.178277

@@ -1,7 +1,6 @@
 #!/bin/bash
 BAG=~/catkin_ws/src/Localiza-o-Robotica/bags/husky_trajectory.bag
 
-roslaunch localiza_o_robotica replay_bag.launch mode:=$MODE bag:=$BAG
 for MODE in odom odom_imu odom_imu_gps; do
     echo "=== Rodando modo: $MODE ==="
     roslaunch localiza_o_robotica replay_bag.launch mode:=$MODE bag:=$BAG
